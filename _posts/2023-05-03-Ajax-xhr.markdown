@@ -1,0 +1,127 @@
+---
+layout: post
+title: "Ajax, xhr"
+date: 2023-05-03 23:49:00 +0900
+tags: Aajx Javascript
+description: Ajax와 Xhr, HttpStatus
+---
+
+Ajax라 함은 `Asynchronous JavaScript and XML`을 뜻하며
+
+풀어 뜻하면 비동기 JavaScript, XML을 말하게 된다.
+
+즉 익숙한 서버와의 통신을 위해 사용한 XML로 이해한다.
+
+통신을 위한 점으로서 `XMLHttpRequest`를 사용한다.
+
+서버에서 데이터를 가져와야하는 경우 `Server-sent events`를,
+
+완전한 양방향 통신의 경우 `WebSocket`을 선호하는 편이다.
+
+호환성 코드로서 HTTP request를 만드는 방법
+
+{% highlight ruby %}
+
+var httpRequest;
+
+// 모질라, 사파리, IE7+ ...
+if (window.XMLHttpRequest) {
+httpRequest = new XMLHttpRequest();
+
+    // IE 6 이하
+
+} else if (window.ActiveXObject) {
+httpRequest = new ActiveXObject("Microsoft.XMLHTTP");
+}
+
+//요청에 대한 상태 변화시 실행되는 함수
+httpRequest.onreadystatechange = nameOfTheFunction;
+//또는
+httpRequest.onreadystatechange = ()=>{
+someAction
+}
+
+//헤더의 설정
+httpRequest.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+{% endhighlight %}
+
+보내는 방법
+
+{% highlight ruby %}
+httpRequest.open('GET', 'http://www.example.org/some.file', true);
+httpRequest.send(null);
+{% endhighlight %}
+
+`open()의 파라미터`로서
+
+첫번째 파라미터는 HTTP요구방식 또는 서버의 방식이다. `예): GET, HEAD, PUT, POST 등`
+이는 HTTP표준에 따라 대문자로 표기해야하며, 그렇지 않을 경우 특정 브라우저는 이 요구를 처리하지 않을 수 있다. 요구방식의 정보는 [W3C명세]에서 확인가능하다
+
+두번째 파라미터는 요구 URL이다.
+보안의 이유로 서드파티도메인은 호출할 수 없으며, 'permission denied'에러의 발생 가능성이 있다.
+다른 도메인으로의 요청에는 CORS설정을 해야한다.
+
+세번째 파라미터(생략가능)은 비동기 여부이다.
+true(기본값)일경우 비동기처리, false일 경우 동기처리를한다.
+
+{% highlight ruby %}
+
+if (httpRequest.readyState === XMLHttpRequest.DONE) {
+// 이상 없음, 응답 받았음
+} else {
+// 아직 준비되지 않음
+}
+
+{% endhighlight %}
+
+`응답 상태에 대한 처리`는 이처럼 가능하다.
+
+`readyState`에 대한값의 목록은 아래와 같다.
+
+0 (uninitialized) - (request가 초기화되지 않음)
+
+1 (loading) - (서버와의 연결이 성사됨)
+
+2 (loaded) - (서버가 request를 받음)
+
+3 (interactive) - (request(요청)을 처리하는 중)
+
+4 (complete) - (request에 대한 처리가 끝났으며 응답할 준비가 완료됨)
+
+{% highlight ruby %}
+
+if (httpRequest.status === 200) {
+// 이상 없음!
+} else {
+// 요구를 처리하는 과정에서 문제가 발생되었음
+// 예를 들어 응답 상태 코드는 404 (Not Found) 이거나
+// 혹은 500 (Internal Server Error) 이 될 수 있음
+}
+
+{% endhighlight %}
+status에 대한 처리는 이와같이 처리하며 [rfc-status]에서 확인 가능하다
+표준으로서 이렇게 사용된다고 한다.
+
+1xx (Informational): The request was received, continuing process
+
+2xx (Successful): The request was successfully received, understood, and accepted
+
+3xx (Redirection): Further action needs to be taken in order to complete the request
+
+4xx (Client Error): The request contains bad syntax or cannot be fulfilled
+
+5xx (Server Error): The server failed to fulfill an apparently valid request
+
+서버에서 받은 응답데이터에는 `httpRequest.responseText`(응답 메시지) 또는
+
+`httpRequest.responseXML`로 접근하여 `XMLDocument`로 변환하여 DOM객체로서 다룰 수 있다.
+
+참고 자료.
+
+[MDN Ajax시작하기]
+[W3C명세]
+
+[MDN Ajax시작하기]: https://developer.mozilla.org/ko/docs/Web/Guide/AJAX/Getting_Started
+[W3C명세]: https://www.rfc-editor.org/rfc/rfc9110.html
+[rfc-status]: https://www.rfc-editor.org/rfc/rfc9110.html
