@@ -1,0 +1,133 @@
+---
+layout: post
+title: "Sql-1, Select-1"
+date: 2023-05-15 23:40:00 +0900
+tags: SQL DML SELECT
+description: Select에 대해
+---
+
+`SQL`은 Structured Query Language(구조적 질의 언어)의 줄임말로 `RDBMS`, Relational database management system(관계형 데이터베이스 관리 시스템)의 데이터 관리를 위해 설계된 언어이다.
+
+SQL의 문법은 크게 3가지로 나뉜다.
+
+1. `DDL`(Data Definition Language, 데이터 정의 언어)
+   각 릴레이션을 정의하기 위해 사용 (CREATE, ALTER, DROP ...)
+2. `DML`(Data Manipulation Language, 데이터 조작 언어)
+   데이터의 조회, 추가, 수정, 삭제(`CRUD`)에 사용 (SELECT, INSERT, UPDATE ...)
+3. `DCL`(Data Control Language, 데이터 제어 언어)
+   사용자 관리 및 사용자별 릴레이션 또는 데이터의 관리, 접근 권한을 다루는데 사용 (GRANT, REVEKE...)
+
+이중 가장 많이 쓰게됬던 DML SELECT에 대해 알아봤다.
+
+아래는 SELECT를 쓴다면 부분 부분 접하기 쉬울 수도 있는 쿼리이다.
+
+{% highlight ruby %}
+SELECT
+A.ID
+,AVG(B.SALARY) AS SAL_AVG
+FROM EMPLOYEES as A
+INNER JOIN OTHER_EMPLOYEES as B
+ON A.ID = B.ID
+WHERE SALARY > 13000
+GROUP BY A.ID
+HAVING COUNT(\*) > 1
+ORDER BY A.ID DESC;
+
+{% endhighlight %}
+
+실행순서는 아래와 같다.
+
+{% highlight ruby %}
+FROM, JOIN -> WHERE -> GROUP BY -> HAVING -> SELECT -> ORDER BY -> LIMIT
+{% endhighlight %}
+
+순서를 먼저 설명한것은 이 내용이 성능과 결과에 큰 영향을 끼치기 때문이다.
+
+SELECT의 성능은 다른 DML보다 중요하다고 생각한다.
+
+왜냐하면 어느 사이트에 가더라도 가장 먼저 사용하게되며 가장 많이 사용할 수 밖에 없기 때문이다.
+
+또한 나는 사이트 회원가입, 탈퇴, 수정 등은 로딩창과 함께 기다릴 수 있지만 검색이나 조회가 오래 걸리는건 답답하고 화나기 때문이다.
+
+예시로서 날짜컬럼을 기준으로 오름차순 정렬을하여 순번을 붙인다고 할경우,
+
+ROWNUM을 사용하는게 간편하여 자주 사용한다.
+
+이는 SELECT와 ORDER BY의 사이에 위치해 같은 레벨로 실행할 경우 순번이 붙은 결과가
+
+오름차순으로 정렬된다.
+
+또한 OUTER JOIN이 아닌 INNER JOIN의 경우, 예시로서 아래와같다
+
+{% highlight ruby %}
+
+SELECT \*
+FROM EMPLOYEES AS A
+INNER JOIN OTHER_EMPLOYEES AS B
+ON A.ID = B.ID
+WHERE A.ID = '김%'
+
+{% endhighlight %}
+
+위와 같이 조회할 경우 앞서 설명한 순서에따라
+JOIN이 먼저되어 A와 B테이블이 ID를 기준으로 합쳐지고 WHERE의 '김%'조건을 찾게된다.
+
+하지만 이는 초기 쓸모없는 데이터를 DB가 많이 처리해야한다.
+
+그러므로 성능적인 측면에서는 아래의 쿼리가 나은편이다
+
+{% highlight ruby %}
+
+SELECT \*
+FROM(
+SELECT \*
+FROM EMPLOYEES AS A
+WHERE A.ID = '김%'
+) A_FILTER
+INNER JOIN OTHER_EMPLOYEES AS B
+ON A.ID = B.ID
+
+{% endhighlight %}
+
+이는 INNER JOIN이 교집합임을 생각하면 쉽게 이해할 수 있다.
+
+우선 A에서 조건에 맞는 테이블을 조회함으로서 데이터의 양을 줄이고
+
+필터링된 데이터에 B의 교집합을 구하게되는 것이다.
+
+위의 경우에서 더욱 DB의 부담을 줄이고 싶다면,
+
+필요한 데이터만 뽑아내는것이다.
+
+{% highlight ruby %}
+
+SELECT \*
+FROM(
+SELECT A.ID
+FROM EMPLOYEES AS A
+WHERE A.ID = '김%'
+) A_FILTER
+INNER JOIN OTHER_EMPLOYEES AS B
+ON A.ID = B.ID
+
+{% endhighlight %}
+
+이런식으로 줄일 수 있다.
+
+다시한번 순서의 중요함으로, 먼저 실행되는 구문중에서 무턱대고 실행하다가는 부담이 생각보다 크게 갈 수 있다는 것을 명심해야한다.
+
+그래야 불필요한 데이터 없이 필요한 데이터만을 뽑아낼 수 있다.
+
+하지만, 성능이 언제나 우선은 아니다.
+
+사람이 언제나 혼자 일 할 수는 없으므로, 타인과의 협업도 염두에 두고
+
+사람의 기억은 영원하지 않으니 다시 자신이 보더라도 이해할 수 있는 가독성은 최소한으로 갖춰야한다.
+
+참고 자료.
+
+[구름-한눈에끝내는SQL],
+[구루비]
+
+[구름-한눈에끝내는SQL]: https://edu.goorm.io/learn/lecture/15413/%ED%95%9C-%EB%88%88%EC%97%90-%EB%81%9D%EB%82%B4%EB%8A%94-sql/lesson/767683/sql%EC%9D%B4%EB%9E%80
+[구루비]: http://www.gurubee.net

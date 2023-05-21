@@ -1,0 +1,67 @@
+---
+layout: post
+title: "OSI 7 Layer"
+date: 2023-05-21 19:40:00 +0900
+tags: CS OSI7Layer
+description: OSI 7 Layer, TCP 4 Layer
+---
+
+# OSI 7계층
+
+OSI 7 계층은 네트워크 통신 구조를 7계층으로 분리해 `독립된 각 계층간의 상호 작동 방식`을 정한것이며, ISO(국제표준화기구)에서 개발한 모델이다.
+
+![img]({{ '/assets/images/OSI_7_Layer.jpg' | relative_url }}){: .center-image }
+![img]({{ '/assets/images/OSI_7_Layer_Transport.jpg' | relative_url }}){: .center-image }_(출처: 해시넷위키\_OSI7계층)_
+
+이 모델은 서로 다른 컴퓨터 기기간의 네트워크 형성을 위해 규정된 네트워크 모델 표준안이다.
+그림과 같이 실제 데이터의 전달은 1계층(물리 계층, Physical Layer)에서 실제 전달되며 상위 계층에서는 데이터를 하위 계층으로 내려 전달한다.
+`이때, 하위 계층은 상위 계층에서 온 데이터에 자신의 계층 특성을 담은 정보를 헤더와 시켜 붙이게 되는데 이를 데이터 캡슐화 라고 한다.`
+담기는 정보는 PDU(Protocal Data Unit)로 불리며 계층별 정보 처리의 단위이다.
+
+|-----------------+------------+-----------------+----------------|
+| 계층 |이름| 단위(PDU) | 예시 | 프로토콜|
+|-----------------|:-----------|:---------------:|---------------:|
+| 7 |응용 계층 | Data | Telnet, email, 브라우저 | HTTP, SMTP, SSH, FTP, Telnet, DNS..
+| 6 |표현 계층 | Data | 인코딩, 디코딩, 암호화, 복호화 | ASCII, MPEG, JPEG, MIDI, EBCDIC, XDR, AFP, PAP...
+| 5 |세션 계층 | Data | Telnet, email, 브라우저 | NetBIOS, SAP, SDP, PIPO, SSL, TLS, NWLink, ASP, ADSP..
+| 4 |전송 계층 | TCP-Segment, UDP-datagram | |TCP, UDP, SPX, SCTP..
+| 3 |네트워크 계층 | Packet | Telnet, email, 브라우저 | IP, IPX, IPsec..
+| 2 |데이터링크 계층 | Frame | Telnet, email, 브라우저 | Ethernet, Token Ring, AppleTalk, PPP, ATM..
+| 1 |물리 계층 | Bit | Telnet, email, 브라우저 | 10BASE-T, 100BASE-TX, ISDN, wired, wireless..
+{:.inner-borders}
+
+# TCP/IP 4계층
+
+인터넷 통신의 기반이 되는 프로토콜로서 OSI 모델 기반으로 단순화된 모형이다.
+
+![img]({{ '/assets/images/OSI_7_Layer_TCPIP.jpg' | relative_url }}){: .center-image }_(출처: 해시넷위키\_OSI7계층)_
+
+## 공통점
+
+|-----------------+------------+-----------------+----------------|
+| 구분 |공통점| 설명 |
+|-----------------|:-----------|:---------------:|---------------:|
+| 계층 역할 |캡슐화, 프로토콜 사용 | 계층 간 역할 정의 |
+| 계층 역할 |서비스 프리미티브 | 요구, 지시, 응답, 확인 |
+| 통신 역할 |페이로드 전송 기능 | APP 간 메세지 교환 |
+| 통신 역할 |다중화, 역다중화 | 포트 기반 세그먼트화 |
+{:.inner-borders}
+
+## 차이점
+
+|-----------------+------------+-----------------+----------------|
+| 항목 | OSI 7 계층 | TCP/IP 4 계층 |
+| --------- | :-------------------- | :--------------------: |
+| 계층 | 7 계층 모델 | 4 계층 모델 |
+| 구성 | 역할 기반 계층 구성 | 프로토콜의 집합 기반 |
+| 기술 | 통신전반 기술 표준화 | 데이터 전송기술 특화 |
+| 활용 | 통신 모델 표준 제시 | 실무적 통신기술 구현 |
+{:.inner-borders}
+
+참고 자료.
+
+[해시넷위키, <OSI 7 계층>, 2022-03-18],
+[IT양햄찌(jhnyang),〈OSI 7계층 모델 완벽 이해-이유를 알고 개변을 이해하고 전체 보기(7 layer)〉, 《티스토리》, 2019-10-24]
+
+[해시넷위키, <OSI 7 계층>, 2022-03-18]: http://wiki.hash.kr/index.php/OSI_7_%EA%B3%84%EC%B8%B5
+[IT양햄찌(jhnyang),〈OSI 7계층 모델 완벽 이해-이유를 알고 개변을 이해하고 전체 보기(7 layer)〉, 《티스토리》, 2019-10-24]: https://jhnyang.tistory.com/194
